@@ -1,0 +1,69 @@
+.video-content
+{
+    position: absolute;
+    top: 44px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0 !important;
+}
+
+#video-container
+{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+    
+.bg-video
+{
+    height: 100%;
+}
+
+#hud
+{
+    position: absolute;
+    top: 0px; /* header is 44px high */
+    padding-left: 5px;
+    padding-top: 5px;
+    left: 2px;  
+    font-size: 1.2em;
+    
+    /* white with black outline: */
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+}
+
+.crosshairs 
+{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.group
+{
+    position: absolute;
+    bottom: 10px;
+    right: 5px;
+}
+
+.ui-focus,
+.ui-btn:focus
+{
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none ;
+}

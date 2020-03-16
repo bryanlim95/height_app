@@ -1,0 +1,143 @@
+function MeasurementAppController()
+{
+    var self = this;
+    var cameraVideoPageController = null;
+    this.cameraVideoPageInitialised = function(controller)
+    {  
+        // This function defines the buttons and their functions to be used in the app.
+        cameraVideoPageController = controller;
+                var setPhoneHeight = {
+                        title: "Set Phone Height",
+                        onClick: "measurementAppController.setPhoneHeightDialog()"
+                };
+                var setBaseAngle = {
+                        title: "Set Base Position",
+                        onClick: "measurementAppController.setBaseAngleFunc()"
+                };
+                var setApexAngle = {
+                        title: "Set Apex Position",
+                        onClick: "measurementAppController.setApexAngleFunc()"
+                };
+                var resetButton = {
+                        title: "Start Again",
+                        onClick: "measurementAppController.resetApp()"
+                };      
+        // This section defines the different buttons to be displayed in the app.
+        this.buttons1 = [setPhoneHeight];
+        this.buttons2 = [setBaseAngle];
+        this.buttons3 = [setApexAngle];
+        this.buttons4 = [resetButton];
+       
+        this.lastHeightEntered = 100        
+        cameraVideoPageController.addButtons(this.buttons1)
+        cameraVideoPageController.setHeadsUpDisplayHTML('Step 1: To begin, enter the height of your phone above the ground using the "Set Phone Height" button.')        
+        alert('Welcome to the Height Measurement App by Team 24! \n \nMake sure to keep your phone in the same position while using this app. Press "OK" when you are ready to begin.')
+ 
+        // This function informs the user if they move their phone too much. For the app to work correctly, the phone should stay in the same spot.
+        var i = 10
+        setInterval(function(){
+        if ( accX > 2 || accY > 2 || accZ > 2)
+        {
+            // The if statement just ensures that the alert does not pop up too often, by only showing the alerty every 10 times the phone moves too much.
+            if (i == 10)
+            {
+            alert("Please keep your phone in the same position while using this app. \n \nYou are only required to tilt your phone on its axis to use this app.")
+            i = 0
+            }
+            else
+            {
+            i++
+            }
+        }
+        else
+        {
+        }
+        },100)
+    }
+   
+    // This function is for the "Set Phone Height" button and prompts the user for the phone height and sets it as a variable.
+    this.setPhoneHeightDialog = function()
+    {
+    var self = this
+    this.phoneHeight = prompt("Enter your phone height! (centimetres)",this.lastHeightEntered)
+    if (this.phoneHeight > 0){
+    this.lastHeightEntered = this.phoneHeight
+    cameraVideoPageController.addButtons(this.buttons2)
+    cameraVideoPageController.setHeadsUpDisplayHTML('Step 2: Aim your phone at the base of the object then press "Set Base Position".')
+    }
+    else
+    {
+    alert("Unexpected input! Did you enter a number? Please try again!")
+    }
+    }
+ 
+    // This function is for the "Set Base Position" button and uses the phone height, and angle of depression to calculate the horizontal distance from the object.    
+    this.setBaseAngleFunc = function()
+    {
+    if ( betaValue > 0 & betaValue < 90)
+    {
+    var self = this
+    this.angleBase = betaValue
+    this.angleDepression = (90 - betaValue ) * Math.PI / 180
+    this.distance = this.phoneHeight / Math.tan(this.angleDepression)
+    cameraVideoPageController.addButtons(this.buttons3)
+    cameraVideoPageController.setHeadsUpDisplayHTML('Step 3: Aim your phone at the apex (top) of the object then press "Set Apex Position".')
+    }
+    else
+    {
+    alert("Error! Are you aiming at the base of the object? Please try again!")
+    }
+        }
+   
+    // This function is for the "Set Apex Position" button and uses the angle of elevation and horizontal distance to calculate the total height of the object.          
+    this.setApexAngleFunc = function()
+    {
+    var self = this
+   
+    // This if statement checks if the angle to the apex is above the horizontal. If it is, then the object height will be greater than the phone height.
+    if ( betaValue > 90 & betaValue < 180)
+        {
+        this.angleElevation = ( betaValue - 90 ) * Math.PI / 180
+        this.finalHeight = Number( this.distance * Math.tan(this.angleElevation)) + Number(this.phoneHeight)
+        cameraVideoPageController.setHeadsUpDisplayHTML('Height estimation complete! To restart, press the "Start Again" button.')
+        cameraVideoPageController.addButtons(this.buttons4)
+        alert("You are " + this.distance.toFixed(0) + "cm horizontally from the object. \n \nThe height of the object is " + this.finalHeight.toFixed(0) + "cm.")
+        }
+       
+    // This part of the function is run if the apex is below the horizontal. IF it is, then the object height will be lower than the phone height.
+    else if ( betaValue > this.angleBase & betaValue < 90)
+        {
+        this.angleDepression = ( 90 - betaValue ) * Math.PI / 180
+        this.finalHeight = Number(this.phoneHeight) - Number( this.distance * Math.tan(this.angleDepression))
+        cameraVideoPageController.setHeadsUpDisplayHTML('Height estimation complete! To restart, press the "Start Again" button.')
+        cameraVideoPageController.addButtons(this.buttons4)
+        alert("You are " + this.distance.toFixed(0) + "cm horizontally from the object. \n \nThe height of the object is " + this.finalHeight.toFixed(0) + "cm.")
+        }
+   
+    else
+        alert("Error! Are you aiming at the apex of the object? Please try again!")
+    }
+   
+    // This function is for the "Start Again" button and allows the app to reset after finishing an estimation.
+    this.resetApp = function()
+    {
+    var self = this
+    cameraVideoPageController.setHeadsUpDisplayHTML("Step 1: To start the estimation, please set your phone height.")
+    cameraVideoPageController.addButtons(this.buttons1)
+    }  
+}
+ 
+// This function allows the device orientation to be recorded as a variable and used by the functions. It also allows the device motion to be detected.
+function handleOrientation(event)
+    {
+    this.betaValue = event.beta.toFixed(3);
+    }
+window.addEventListener("deviceorientation", handleOrientation, true);
+ 
+function handleMotion(event)
+    {
+    this.accX = event.acceleration.x.toFixed(3);    
+    this.accY = event.acceleration.y.toFixed(3);    
+    this.accZ = event.acceleration.z.toFixed(3);    
+    }
+window.addEventListener("devicemotion", handleMotion, true);
